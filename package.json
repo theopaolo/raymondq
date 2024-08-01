@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "openai": "^4.53.2",
     "vite": "^5.3.5"
   }
 }

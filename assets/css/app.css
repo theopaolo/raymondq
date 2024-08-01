@@ -65,3 +65,16 @@ button:hover {
 .inactive:hover {
     cursor: not-allowed;
 }
+
+.fadeOut {
+    animation: fadeout 1s ease-in-out forwards;
+}
+
+@keyframes fadeout {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}

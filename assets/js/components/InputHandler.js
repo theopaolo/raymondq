@@ -1,5 +1,8 @@
-const API_KEY = import.meta.env.VITE_API_KEY;
+import { OpenAI } from 'openai';
 
+const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+const ORG_ID = import.meta.env.VITE_OPENAI_ORG_ID;
+const PROJECT_ID = import.meta.env.VITE_OPENAI_PROJECT_ID;
 class inputHandler {
     constructor(){
         this.textInput = document.querySelector('.text-input');
@@ -40,45 +43,30 @@ class inputHandler {
     }
 
     async swapText() {
+        // this.textOutput.classList.add('fadeOut')
+
+        // setTimeout( textOutput.classList.remove('fadeOut'), 1000);
+
         const textToSwap = this.textOutput.textContent;
-        // send the text to mistral API
-        const data = {
-            "model": "mistral-small-latest",
-            "messages": [
-                {
-                    "role": "user",
-                    "content": "changer ce text comme si c'était une aventure épic : " + textToSwap
-                }
-            ],
-            "temperature": 0.7,
-            "top_p": 1,
-            "max_tokens": 512,
-            "stream": false,
-            "safe_prompt": false,
-            "random_seed": 1337
-        };
+        const promptContent = `Écris un texte court de deux phrases épique basé sur : "${textToSwap}"`;
+            try {
+                const openai = new OpenAI({
+                    apiKey: API_KEY,
+                    dangerouslyAllowBrowser: true,
+                });
 
-        try {
-            const response = await fetch('https://api.mistral.ai/v1/generate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${API_KEY}`
-                },
-                body: JSON.stringify(data)
-            });
+                const response = await openai.chat.completions.create({
+                    model: 'gpt-4o-mini',
+                    messages: [{ role: 'user', content: promptContent }],
+                    max_tokens: 150,
+                });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const transformedText = response.choices[0].message.content;
+                this.textOutput.textContent = transformedText;
+
+            } catch (error) {
+                console.error('Error:', error);
             }
-
-            const result = await response.json();
-            const transformedText = result.choices[0].text; // Adjust based on the actual API response structure
-            this.textOutput.textContent = transformedText;
-
-        } catch (error) {
-            console.error('Error:', error);
-        }
     }
 }
 
